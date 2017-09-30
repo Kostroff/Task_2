@@ -51,6 +51,35 @@ void ParallelSort(int *begin, int *end)
 	}
 }
 
+// Реализация пункта 4
+void CompareForAndCilk_For(size_t sz)
+{
+	std::vector<int> vec;
+	cilk::reducer<cilk::op_vector<int>>red_vec;
+
+	high_resolution_clock::time_point seq_time1 = high_resolution_clock::now();
+	
+	for (unsigned long i = 0; i < sz; i++)
+	{ 
+		vec.push_back(rand() % 20000 + 1);
+	}
+
+	high_resolution_clock::time_point seq_time2 = high_resolution_clock::now();
+	duration<double> seq_duration = (seq_time2 - seq_time1);
+
+	high_resolution_clock::time_point paral_time1 = high_resolution_clock::now();
+
+	cilk_for (unsigned long i = 0; i < sz; i++)
+	{
+		red_vec->push_back(rand() % 20000 + 1);
+	}
+
+	high_resolution_clock::time_point paral_time2 = high_resolution_clock::now();
+	duration<double> paral_duration = (paral_time2 - paral_time1);
+
+	printf("Sequental: %f sec\tParallel: %f\tsz: %d\n", seq_duration.count(), paral_duration.count(), sz);
+}
+
 int main()
 {
 	srand((unsigned)time(0));
@@ -85,6 +114,18 @@ int main()
 	ReducerMaxTest(mass, mass_size);
 	ReducerMinTest(mass, mass_size);
 
+	printf("\n");
+	CompareForAndCilk_For(10);
+	CompareForAndCilk_For(50);
+	CompareForAndCilk_For(100);
+	CompareForAndCilk_For(500);
+	CompareForAndCilk_For(1000);
+	CompareForAndCilk_For(10000);
+	CompareForAndCilk_For(100000);
+	CompareForAndCilk_For(1000000);
+	printf("\n");
+
 	delete[]mass;
+	system("pause");
 	return 0;
 }

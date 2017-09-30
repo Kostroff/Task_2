@@ -39,7 +39,7 @@ void ReducerMinTest(int *mass_pointer, const long size)
 /// begin - указатель на первый элемент исходного массива
 /// end - указатель на последний элемент исходного массива
 void ParallelSort(int *begin, int *end)
-{
+{	
 	if (begin != end) 
 	{
 		--end;
@@ -51,7 +51,6 @@ void ParallelSort(int *begin, int *end)
 	}
 }
 
-
 int main()
 {
 	srand((unsigned)time(0));
@@ -60,7 +59,7 @@ int main()
 	__cilkrts_set_param("nworkers", "4");
 
 	long i;
-	const long mass_size = 10000;
+	const long mass_size = 1000000;
 	int *mass_begin, *mass_end;
 	int *mass = new int[mass_size]; 
 
@@ -73,8 +72,16 @@ int main()
 	mass_end = mass_begin + mass_size;
 	ReducerMaxTest(mass, mass_size);
 	ReducerMinTest(mass, mass_size);
-
+	
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+	
 	ParallelSort(mass_begin, mass_end);
+	
+	high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+	duration<double> duration = (t2 - t1);
+	printf("Duration is: %f seconds\nmass_size: %d\n", duration.count(), mass_size);
+
 	ReducerMaxTest(mass, mass_size);
 	ReducerMinTest(mass, mass_size);
 
